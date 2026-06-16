@@ -1,0 +1,26 @@
+version: "3.9"
+
+services:
+  pdf-editor:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pdf-editor
+    ports:
+      - "8000:8000"
+    volumes:
+      # live-reload: mount source so changes reflect without rebuild
+      - ./backend:/app/backend
+      - ./frontend:/app/frontend
+      # persistent storage for uploaded/exported PDFs
+      - pdf_uploads:/tmp/pdf_uploads
+      - pdf_outputs:/tmp/pdf_outputs
+    environment:
+      - UPLOAD_DIR=/tmp/pdf_uploads
+      - OUTPUT_DIR=/tmp/pdf_outputs
+      - MAX_FILE_SIZE_MB=50
+    restart: unless-stopped
+
+volumes:
+  pdf_uploads:
+  pdf_outputs:
