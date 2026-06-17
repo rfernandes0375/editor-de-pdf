@@ -29,4 +29,5 @@ RUN mkdir -p /tmp/pdf_uploads /tmp/pdf_outputs
 
 EXPOSE 8000
 
-CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+# Usa variável $PORT injetada pelo Render (fallback 8000 para local)
+CMD uvicorn backend.main:app --host 0.0.0.0 --port ${PORT:-8000}

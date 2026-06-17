@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: editor-de-pdf
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    envVars:
+      - key: UPLOAD_DIR
+        value: /tmp/pdf_uploads
+      - key: OUTPUT_DIR
+        value: /tmp/pdf_outputs
+      - key: MAX_FILE_SIZE_MB
+        value: 50
+    healthCheckPath: /api/health

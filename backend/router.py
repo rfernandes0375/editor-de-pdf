@@ -3,7 +3,7 @@ Routers da API REST.
 """
 
 from fastapi import APIRouter, HTTPException, UploadFile, File
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 
 from backend.config import (
     ALLOWED_CONTENT_TYPE,
@@ -11,7 +11,7 @@ from backend.config import (
     MAX_FILE_SIZE_MB,
     OUTPUT_DIR,
 )
-from backend.pdf_service import apply_edits_and_export, extract_document, save_upload
+from backend.pdf_service import apply_edits_and_export, extract_document, save_upload, render_page_image
 from backend.schemas import DocumentInfo, ExportRequest
 
 router = APIRouter(prefix="/api", tags=["pdf"])
@@ -61,6 +61,29 @@ async def upload_pdf(file: UploadFile = File(...)) -> DocumentInfo:
         ) from exc
 
     return doc_info
+
+
+# ── page image ────────────────────────────────────────────────────────────────
+
+@router.get("/document/{session_id}/page/{page_number}/image", summary="Obter imagem da página")
+async def get_page_image(session_id: str, page_number: int) -> Response:
+    """
+    Retorna a imagem PNG de uma página específica do PDF para ser usada
+    como background no editor WYSIWYG.
+    """
+    try:
+        image_bytes = render_page_image(session_id, page_number)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500, detail=f"Erro interno ao renderizar imagem: {exc}"
+        ) from exc
+
+    return Response(content=image_bytes, media_type="image/png")
+
 
 
 # ── export ────────────────────────────────────────────────────────────────────

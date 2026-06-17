@@ -56,14 +56,15 @@ _DEFAULT = ("helv", "hebo", "helvetica, arial, sans-serif")
 
 def _map_font(raw_font: str) -> Tuple[str, str, str]:
     """
-    Dado o nome bruto de uma fonte PDF, retorna
+    Dado o nome bruto de uma fonte PDF ou um código base14, retorna
     (base14_regular, base14_bold, css_family).
 
     Remove prefixos de fontes embutidas (ex: "ABCDEF+TimesNewRomanPSMT").
     """
     name = raw_font.split("+")[-1].lower()
     for keywords, reg, bold, css in _FONT_MAP:
-        if any(k in name for k in keywords):
+        # Se for palavra-chave ou se já for o próprio código base14 (reg/bold)
+        if any(k in name for k in keywords) or name in [reg, bold]:
             return reg, bold, css
     return _DEFAULT
 
@@ -342,7 +343,7 @@ def apply_edits_and_export(request: ExportRequest) -> Path:
 
 def save_upload(file_bytes: bytes, original_filename: str) -> Tuple[str, Path]:
     """
-    Salva o arquivo enviado em UPLOAD_DF com um session_id único.
+    Salva o arquivo enviado em UPLOAD_DIR com um session_id único.
 
     Args:
         file_bytes: Conteúdo binário do PDF.
@@ -355,3 +356,41 @@ def save_upload(file_bytes: bytes, original_filename: str) -> Tuple[str, Path]:
     dest = UPLOAD_DIR / f"{session_id}.pdf"
     dest.write_bytes(file_bytes)
     return session_id, dest
+
+
+def render_page_image(session_id: str, page_number: int) -> bytes:
+    """
+    Renderiza uma página do PDF em formato PNG para ser usada como background
+    no editor WYSIWYG.
+    
+    Args:
+        session_id: ID da sessão (nome do arquivo base).
+        page_number: Número da página (0-indexado).
+        
+    Returns:
+        Bytes da imagem PNG.
+        
+    Raises:
+        FileNotFoundError: Se o documento não existir.
+        ValueError: Se a página for inválida.
+    """
+    source_path = UPLOAD_DIR / f"{session_id}.pdf"
+    if not source_path.exists():
+        raise FileNotFoundError(f"Sessão não encontrada: {session_id}")
+
+    try:
+        doc = fitz.open(str(source_path))
+    except Exception as exc:
+        raise ValueError(f"Erro ao abrir PDF: {exc}") from exc
+
+    if page_number < 0 or page_number >= len(doc):
+        doc.close()
+        raise ValueError(f"Página {page_number} inválida.")
+
+    page = doc[page_number]
+    # Usando DPI padrão (ex: 150) para ter uma boa resolução sem pesar demais
+    pix = page.get_pixmap(dpi=150)
+    image_bytes = pix.tobytes("png")
+    doc.close()
+    
+    return image_bytes

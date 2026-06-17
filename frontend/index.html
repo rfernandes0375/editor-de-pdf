@@ -16,7 +16,7 @@
   <header>
     <div class="logo-icon" aria-hidden="true">📝</div>
     <h1>Editor de PDF Local</h1>
-    <span class="badge">v1.0 · Local</span>
+    <span class="badge">v1.1 · Local</span>
   </header>
 
   <!-- ── Main ────────────────────────────────────────────────────────────── -->
@@ -33,81 +33,34 @@
       </div>
     </div>
 
-    <!-- Editor de blocos -->
-    <div id="editor-section" class="card hidden">
-      <div class="card-title"><span>✏️</span> Editar Texto Existente</div>
-
-      <!-- Toolbar -->
-      <div id="toolbar" style="margin-bottom:16px">
-        <span id="doc-name"></span>
-        <div class="page-nav">
-          <label for="page-select">Página:</label>
-          <select id="page-select" aria-label="Selecionar página"></select>
+    <!-- WYSIWYG Editor -->
+    <div id="wysiwyg-editor" class="card hidden" style="display:flex;flex-direction:column;">
+      <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;">
+        <div><span>✏️</span> Editor Visual</div>
+        <div class="toolbar" style="display:flex;gap:8px;align-items:center;">
+          <span id="doc-name" style="font-weight:600;font-size:0.9rem;"></span>
+          <div style="width:1px;height:24px;background:var(--c-border);margin:0 8px;"></div>
+          <button id="zoom-out" class="btn btn-outline" title="Menos zoom">➖</button>
+          <span id="zoom-level" style="font-size:0.85rem;min-width:40px;text-align:center;">100%</span>
+          <button id="zoom-in" class="btn btn-outline" title="Mais zoom">➕</button>
         </div>
       </div>
 
-      <hr style="margin-bottom:16px" />
-
-      <!-- Lista de blocos -->
-      <div id="blocks-container">
-        <div class="empty-state">
-          <span class="icon">📂</span>
-          <p>Carregue um PDF para ver os blocos de texto.</p>
+      <div class="canvas-wrapper">
+        <div id="canvas-container" class="canvas-container">
+          <!-- Background image and overlay blocks will be injected here -->
         </div>
       </div>
+      <p class="bold-hint" style="margin-top:12px;justify-content:center;">✦ Dê um <b>Duplo Clique</b> em qualquer lugar do documento para adicionar um novo texto.</p>
     </div>
 
-    <!-- Adicionar novo texto -->
-    <div id="add-section" class="card hidden">
-      <div class="card-title"><span>➕</span> Adicionar Novo Bloco de Texto</div>
-
-      <div id="add-panel">
-        <!-- Linha 1 -->
-        <div class="form-group full">
-          <label for="new-text">Texto
-            <button id="new-bold-btn" class="btn btn-bold" type="button" title="Negritar seleção (Ctrl+B)"><b>N</b></button>
-          </label>
-          <textarea id="new-text" placeholder="Digite o texto a inserir…" rows="3" spellcheck="false"></textarea>
-          <p class="bold-hint">✦ Selecione parte do texto e clique <b>N</b> (ou <kbd>Ctrl+B</kbd>) para negritar só esse trecho</p>
-        </div>
-
-        <!-- Linha 2 -->
-        <div class="form-group">
-          <label for="add-page">Página</label>
-          <select id="add-page" aria-label="Página de destino"></select>
-        </div>
-        <div class="form-group">
-          <label for="new-size">Tamanho da Fonte (pt)</label>
-          <input type="number" id="new-size" value="12" min="4" max="144" />
-        </div>
-
-        <!-- Linha 3 -->
-        <div class="form-group">
-          <label for="new-x">Posição X (pt)</label>
-          <input type="number" id="new-x" placeholder="ex: 72" />
-        </div>
-        <div class="form-group">
-          <label for="new-y">Posição Y (pt)</label>
-          <input type="number" id="new-y" placeholder="ex: 100" />
-        </div>
-
-        <!-- Linha 4 -->
-        <div class="form-group">
-          <label for="new-color">Cor do Texto</label>
-          <input type="color" id="new-color" value="#000000" style="height:42px;width:100%;cursor:pointer" />
-        </div>
-        <div class="form-group" style="justify-content:flex-end">
-          <button id="add-btn" class="btn btn-primary" style="align-self:flex-end">
-            <span>➕</span> Adicionar Bloco
-          </button>
-        </div>
-
-        <!-- Preview de adições -->
-        <div class="form-group full">
-          <label>Blocos Adicionados</label>
-          <div id="additions-list" class="additions-list"></div>
-        </div>
-      </div>
+    <!-- Floating Formatting Toolbar -->
+    <div id="floating-toolbar" class="floating-toolbar hidden">
+      <input type="number" id="ft-size" title="Tamanho da fonte" min="4" max="144" style="width:60px;padding:4px;" />
+      <input type="color" id="ft-color" title="Cor do texto" style="width:30px;height:30px;padding:0;cursor:pointer;" />
+      <button id="ft-bold" class="btn btn-bold" title="Negritar seleção (Ctrl+B)"><b>N</b></button>
+      <div style="width:1px;height:20px;background:var(--c-border);margin:0 4px;"></div>
+      <button id="ft-delete" class="btn btn-danger" title="Excluir bloco" style="padding:4px 8px;">🗑️</button>
     </div>
 
     <!-- Exportar -->
@@ -125,9 +78,8 @@
 
   </main>
 
-  <!-- Toast container -->
   <div id="toast-container" aria-live="polite"></div>
 
-  <script src="app.js"></script>
+  <script src="app.js?v=2"></script>
 </body>
 </html>
