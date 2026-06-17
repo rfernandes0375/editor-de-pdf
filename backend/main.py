@@ -14,7 +14,7 @@ from backend.router import router
 # ── aplicação ─────────────────────────────────────────────────────────────────
 
 app = FastAPI(
-    title="Editor de PDF Local",
+    title="Editor de PDF Rodrigo Ferreira",
     description="API para upload, edição e exportação de documentos PDF.",
     version="1.0.0",
 )

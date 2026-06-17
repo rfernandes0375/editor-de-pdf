@@ -1,4 +1,4 @@
-# 📝 Editor de PDF Local
+# 📝 Editor de PDF Rodrigo Ferreira
 
 Ferramenta interna para upload, edição e exportação de documentos PDF.  
 Roda **100% localmente** — sem dados saindo do seu ambiente.
